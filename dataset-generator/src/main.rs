@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use std::convert::AsRef;
 use std::path::Path;
 
@@ -30,12 +31,12 @@ fn extract_links_from_html_file<P: AsRef<Path>>(path: P) -> Result<Vec<String>> 
 }
 
 fn main() {
-    let mut paths_count = 0;
-    for path in glob::glob("../reference/**/*.html").expect("Valid glob pattern").flatten() {
-        match extract_links_from_html_file(path.clone()) {
-            Ok(vec) => paths_count += vec.len(),
-            Err(error) => println!("Path {path:?} failed: {error}"),
-        }
-    }
+    let paths_count: usize = glob::glob("../reference/**/*.html")
+        .expect("Valid glob pattern")
+        .flatten()
+        .collect::<Vec<_>>()
+        .par_iter()
+        .map(|path| extract_links_from_html_file(path.clone()).unwrap().len())
+        .sum();
     println!("Count: {paths_count}");
 }
