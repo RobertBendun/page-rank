@@ -1,5 +1,9 @@
 # Page Rank
 
+[Plan działania](./roadmap.md)
+
+## Treść zadania
+
 Uproszczony algorytm Page Rank:
 
 - Implementacja iteracyjnej metody obliczania wartości własnych macierzy.
