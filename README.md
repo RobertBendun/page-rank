@@ -10,12 +10,34 @@ Uproszczony algorytm Page Rank:
 - Wykorzystanie do uproszczonej implementacji algorytmu Page Rank.
 - Dyskusja zachowania przy różnych skalach grafów relacji.
 
-## Propozycja zbioru danych
+## Zbiory danych
 
-[Zbiór danych](https://github.com/PeterFeicht/cppreference-doc/releases/download/v20220730/html-book-20220730.zip).
+| Nazwa | Liczba plików | Liczba powiązań | Źródło |
+| ---   | ---           | ---             | --- |
+| C++ Reference | 5835 | 758340 | [Źródło](https://github.com/PeterFeicht/cppreference-doc/releases/download/v20220730/html-book-20220730.zip) |
 
+### Generowanie zbiorów danych
+
+Wymagania:
+
+- Rust
+- Program `unzip`
+
+Uruchom generator odpowiadający danemu zbiorowi danych. Przykładowo:
+
+```sh
+$ ./generate-cpp-reference-dataset.sh
 ```
-$ unzip html-book-20220730.zip
-$ ./count-links.py ./reference/
-In 5835 found 758340 links
+
+Stworzy on plik odpowiadający danemu zbiorowi (w tym przypadku `cppreference.json`).
+Posiada on następującą strukturę:
+
+```typescript
+{
+	// Wersja pliku, nowszy generator może stworzyć plik o nowszej wersji
+	version: string;
+
+	// Kolejne strony oraz linki na nie się składające
+	pages: { [page: string]: []string };
+}
 ```
