@@ -1,3 +1,4 @@
-*.xml
-reference/
-*.zip
+target
+cppreference.json
+cppreference
+cppreference.zip
