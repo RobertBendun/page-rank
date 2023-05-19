@@ -20,9 +20,5 @@ if [ ! -e "${DATASET_GENERATOR}" ]; then
 	cargo build --release
 fi
 
-if [ -e "${TARGET_JSON_NAME}" ]; then
-	echo "${TARGET_JSON_NAME} file aready exists, skipping"
-else
-	"${DATASET_GENERATOR}" --cppreference "${TARGET_REFERENCE_DIR}" -o cppreference.json
-fi
+"${DATASET_GENERATOR}" --cppreference "${TARGET_REFERENCE_DIR}" -o cppreference.json
 

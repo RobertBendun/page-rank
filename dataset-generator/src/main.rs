@@ -1,24 +1,24 @@
+use clap::Parser;
 use rayon::prelude::*;
 use std::convert::AsRef;
 use std::path::Path;
-use clap::Parser;
 
 pub mod json;
 use crate::json::Json;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-const VERSION: &str = "1";
+const VERSION: &str = "2";
 
 #[derive(Parser)]
 struct CommandLine {
     /// Output path for produced JSON
-    #[arg(short,long)]
+    #[arg(short, long)]
     output: String,
 
     /// Generate JSON from cppreference dataset
-    #[arg(short,long)]
-    cppreference: Option<String>
+    #[arg(short, long)]
+    cppreference: Option<String>,
 }
 
 fn extract_attribute<'a>(
@@ -34,28 +34,42 @@ fn extract_attribute<'a>(
         .try_as_utf8_str()
 }
 
-fn extract_links_from_html_file<P: AsRef<Path> + std::fmt::Debug + Clone>(path: P) -> Result<Vec<String>> {
+fn extract_links_from_html_file<P: AsRef<Path> + std::fmt::Debug + Clone>(
+    path: P,
+) -> Result<(String, Vec<String>)> {
     let content = std::fs::read_to_string(path.clone())?;
     let html = tl::parse(&content, tl::ParserOptions::default())?;
 
-    Ok(html
-        .query_selector("a[href]")
-        .expect("Query selector is well written, I promise")
-        .filter_map(|element| extract_attribute(html.parser(), element, "href"))
-        .filter(|href| {
-            !href.contains("http:") && !href.contains("https:") && !href.contains("ftp:")
-        })
-        .map(|uri| match uri.find('#') {
-            Some(start_of_fragment) => &uri[..start_of_fragment],
-            None => uri,
-        })
-        .flat_map(urlencoding::decode)
-        .map(String::from)
-        .collect())
+    let title = html
+        .query_selector("title")
+        .expect("title element")
+        .next()
+        .unwrap()
+        .get(html.parser())
+        .expect("title element")
+        .inner_text(html.parser());
+
+    let title = html_escape::decode_html_entities(&title);
+
+    Ok((
+        title.to_string(),
+        html.query_selector("a[href]")
+            .expect("Query selector is well written, I promise")
+            .filter_map(|element| extract_attribute(html.parser(), element, "href"))
+            .filter(|href| {
+                !href.contains("http:") && !href.contains("https:") && !href.contains("ftp:")
+            })
+            .map(|uri| match uri.find('#') {
+                Some(start_of_fragment) => &uri[..start_of_fragment],
+                None => uri,
+            })
+            .flat_map(urlencoding::decode)
+            .map(String::from)
+            .collect(),
+    ))
 }
 
-pub fn generate_cpp_dataset<Out: std::io::Write>(cppreference: &str, out: Out) -> Result<()>
-{
+pub fn generate_cpp_dataset<Out: std::io::Write>(cppreference: &str, out: Out) -> Result<()> {
     let paths = glob::glob(cppreference)
         .expect("Valid glob pattern")
         .flatten()
@@ -76,10 +90,14 @@ pub fn generate_cpp_dataset<Out: std::io::Write>(cppreference: &str, out: Out) -
     obj.key("pages")?;
     let mut pages = obj.object()?;
 
-
-    for (page, links) in links_for_pages {
+    for (page, (title, links)) in links_for_pages {
         pages.key(page.to_str().unwrap())?;
-        let mut current_page = pages.array()?;
+        let mut current_page_info = pages.object()?;
+        current_page_info.key("title")?;
+        current_page_info.set(&*title)?;
+
+        current_page_info.key("references")?;
+        let mut current_page = current_page_info.array()?;
 
         for link in links {
             let mut full_link = page.parent().unwrap().to_owned();

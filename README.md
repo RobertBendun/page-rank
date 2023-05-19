@@ -38,6 +38,11 @@ Posiada on następującą strukturę:
 	version: string;
 
 	// Kolejne strony oraz linki na nie się składające
-	pages: { [page: string]: []string };
+	pages: {
+        [page: string]: {
+            title: string;
+            references: []string;
+        };
+    };
 }
 ```

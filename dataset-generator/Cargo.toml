@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.2.1", features = ["derive"] }
 glob = "0.3.1"
+html-escape = "0.2.13"
 rayon = "1.7.0"
 tl = "0.7.7"
 urlencoding = "2.1.2"
