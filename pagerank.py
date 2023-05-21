@@ -58,7 +58,7 @@ def drawAGraph(G):
 
 def generateData(computePageRank = True):
     global pagerankValues
-    with open('cppreference.json') as file:
+    with open('test.json') as file:
         pages = json.load(file)['pages']
     file.close()
 
@@ -80,10 +80,10 @@ def getMatchingPages(query):
     return matchingPages
 
 def createResponse(pages):
-    global pagerankValues
-    response = dict()
+    global pagerankValues, pageTitles
+    response = list()
     for url in pages:
-        response[url] = pagerankValues[url]
+        response.append({"url": url, "value": pagerankValues[url], "title":pageTitles[url]})
     return json.dumps(response)
 
 class PageRankHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -92,6 +92,8 @@ class PageRankHTTPRequestHandler(BaseHTTPRequestHandler):
             queryParams = parse_qs(parsedUrl.query)
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Methods', 'GET')
             self.end_headers()
 
             searchVal = queryParams.get('q', [''])[0]

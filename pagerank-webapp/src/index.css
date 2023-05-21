@@ -1,0 +1,16 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #dde6ed;
+}
+
+body {
+  width: 100%;
+  height: 100%;
+}
+
+div#app {
+  height: 100vh;
+}
