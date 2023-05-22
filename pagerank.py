@@ -1,12 +1,27 @@
 import json
+import os
 import networkx as nx
 import numpy as np
 import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
+cachePath = "pagerankValuesCache.json"
 pageTitles = dict()
 pagerankValues = dict()
+
+def checkIfDataCached():
+    return os.path.isfile(cachePath)
+
+def saveCache(value):
+    with open(cachePath, "w") as file:
+        json.dump(value, file)
+
+def readCache():
+    global pagerankValues
+    with open(cachePath) as file:
+        pagerankValues =  json.load(file)
+
 
 def googleMatrix(G, alpha=0.85):
     matrix = np.asmatrix(nx.to_numpy_array(G))
@@ -56,26 +71,33 @@ def createTitleDict(pages):
 def drawAGraph(G):
     nx.draw_circular(G, node_size=400, with_labels=True)
 
-def generateData(computePageRank = True):
+def generateData():
     global pagerankValues
-    with open('test.json') as file:
+    with open('cppreference.json') as file:
         pages = json.load(file)['pages']
     file.close()
 
     createTitleDict(pages)
-    if computePageRank: 
+    if checkIfDataCached(): 
+         readCache()
+    else:
         graph = createGraphFromDict(pages)
         # to verify if our implementation is working properly
         #  pagerankValues = nx.pagerank(graph,0.85)
         pagerank(graph)
+        saveCache(pagerankValues)
+
 
 def getMatchingPages(query):
     #return false here if query not defined
     global pageTitles
     query=query.lower()
+    query=query.split(" ")
+
     matchingPages = list()
+
     for url in pageTitles.keys():
-        if(query in (pageTitles[url].lower())):
+        if any(word in (pageTitles[url].lower()) for word in query):
             matchingPages.append(url)
     return matchingPages
 
