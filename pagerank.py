@@ -10,7 +10,7 @@ pagerankValues = dict()
 
 def googleMatrix(G, alpha=0.85):
     matrix = np.asmatrix(nx.to_numpy_array(G))
-    print(len(G))
+    print(f"Node count: {len(G)}")
     nodeCount = len(G)
     if nodeCount == 0:
         return matrix
@@ -32,7 +32,7 @@ def pagerank(G, alpha=0.85):
     if len(G) == 0:
         return {}
     M = googleMatrix(G, alpha)
-    
+
     eigenvalues, eigenvectors = np.linalg.eig(M.T)
     ind = np.argmax(eigenvalues)
 
@@ -58,12 +58,13 @@ def drawAGraph(G):
 
 def generateData(computePageRank = True):
     global pagerankValues
-    with open('test.json') as file:
+
+    with open('cppreference.json') as file:
         pages = json.load(file)['pages']
     file.close()
 
     createTitleDict(pages)
-    if computePageRank: 
+    if computePageRank:
         graph = createGraphFromDict(pages)
         # to verify if our implementation is working properly
         #  pagerankValues = nx.pagerank(graph,0.85)
