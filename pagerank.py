@@ -2,7 +2,6 @@ import json
 import os
 import networkx as nx
 import numpy as np
-import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
