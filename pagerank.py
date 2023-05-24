@@ -42,13 +42,32 @@ def googleMatrix(G, alpha=0.85):
 
     return alpha * matrix + (1 - alpha) * personalizationVector
 
+def powerIteration(A, iterations=100):
+    # Zaczynamy od losowego wektora
+    eigenvector = np.random.rand(A.shape[1]).reshape(-1, 1)
+
+    for _ in range(iterations):
+        # Obliczamy nowy wektor poprzez mnożenie macierzy A i wektora eigenvector
+        b_k1 = np.dot(A, eigenvector)
+
+        # Normalizujemy nowy wektor
+        b_k1_norm = np.linalg.norm(b_k1)
+
+        # Aktualizujemy wektor eigenvector
+        eigenvector = b_k1 / b_k1_norm
+
+    # Po zakończeniu symulacji, nasza przybliżona dominująca wartość własna to
+    eigenvalue = np.dot(eigenvector.T, np.dot(A, eigenvector))
+
+    return eigenvalue, eigenvector
+
 def pagerank(G, alpha=0.85):
     global pagerankValues
     if len(G) == 0:
         return {}
     M = googleMatrix(G, alpha)
 
-    eigenvalues, eigenvectors = np.linalg.eig(M.T)
+    eigenvalues, eigenvectors = powerIteration(M.T)
     ind = np.argmax(eigenvalues)
 
     largest = np.array(eigenvectors[:, ind]).flatten().real
@@ -74,7 +93,7 @@ def drawAGraph(G):
 def generateData():
     global pagerankValues
 
-    with open('test.json') as file:
+    with open('cppreference.json') as file:
         pages = json.load(file)['pages']
     file.close()
 
@@ -87,7 +106,6 @@ def generateData():
         #  pagerankValues = nx.pagerank(graph,0.85)
         pagerank(graph)
         saveCache(pagerankValues)
-
 
 def getMatchingPages(query):
     #return false here if query not defined
@@ -118,7 +136,6 @@ class PageRankHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Access-Control-Allow-Origin', '*')
             self.send_header('Access-Control-Allow-Methods', 'GET')
             self.end_headers()
-
             searchVal = queryParams.get('q', [''])[0]
 
             matchingPages = getMatchingPages(searchVal)
