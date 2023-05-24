@@ -16,6 +16,11 @@ Uproszczony algorytm Page Rank:
 | ---   | ---           | ---             | --- |
 | C++ Reference | 5835 | 758340 | [Źródło](https://github.com/PeterFeicht/cppreference-doc/releases/download/v20220730/html-book-20220730.zip) |
 
+### Demo
+
+- Uruchom backend `python pagerank.py`
+- Uruchom frontend `cd pagerank-webapp; npm run dev`
+
 ### Generowanie zbiorów danych
 
 Wymagania:

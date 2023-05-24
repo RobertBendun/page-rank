@@ -25,7 +25,7 @@ def readCache():
 
 def googleMatrix(G, alpha=0.85):
     matrix = np.asmatrix(nx.to_numpy_array(G))
-    print(len(G))
+    print(f"Node count: {len(G)}")
     nodeCount = len(G)
     if nodeCount == 0:
         return matrix
@@ -47,7 +47,7 @@ def pagerank(G, alpha=0.85):
     if len(G) == 0:
         return {}
     M = googleMatrix(G, alpha)
-    
+
     eigenvalues, eigenvectors = np.linalg.eig(M.T)
     ind = np.argmax(eigenvalues)
 
@@ -73,7 +73,8 @@ def drawAGraph(G):
 
 def generateData():
     global pagerankValues
-    with open('cppreference.json') as file:
+
+    with open('test.json') as file:
         pages = json.load(file)['pages']
     file.close()
 

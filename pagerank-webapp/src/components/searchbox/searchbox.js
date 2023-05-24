@@ -7,7 +7,7 @@ const Searchbox = () => {
   const [result, setResult] = useState([]);
 
   const handleSearch = (e) => {
-    fetch(`http://localhost:8000/?q=${e.target.value}`, {
+    fetch(`/api/?q=${e.target.value}`, {
       mode: "cors",
       headers: {
         "Access-Control-Allow-Origin": "*",
