@@ -3,3 +3,5 @@ cppreference.json
 cppreference
 cppreference.zip
 .DS_Store
+pagerankValuesCache.json
+test.json
